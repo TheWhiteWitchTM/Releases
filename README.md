@@ -17,7 +17,7 @@ This repository collects pre-built releases from across the desk:
 
 | Project | What it is | Where to grab it |
 |---------|------------|------------------|
-| **Grogy** | The Grok study. Chat, Grok Build, Imagine, and the bots. | [0.9.0 Beta](grogy/0.9.0-beta) |
+| **Grogy** | The Grok study. Chat, Grok Build, Imagine, and the bots. | [0.9.1 Beta](grogy/0.9.1-beta) |
 | **Blogy** | Markdown blog editor with AI (Grok) support | [blogy](https://github.com/TheWhiteWitchTM/blogy) |
 | **Vesper** | Linux media player that doesn't suck | [vesper](https://github.com/TheWhiteWitchTM/vesper) |
 | **MAGIC Dock** | Better dock for Pop!_OS / COSMIC with stacks | [MAGIC-Dock](https://github.com/TheWhiteWitchTM/MAGIC-Dock) |
