@@ -388,12 +388,6 @@
     return hay.join(" ").toLowerCase();
   }
 
-  function versionLabel(project) {
-    var latest = project.versions[0];
-    if (!latest) return "";
-    return latest.name === "files" ? "files" : latest.name;
-  }
-
   function cardFor(project) {
     var card = el("article", {
       class: "project",
@@ -481,8 +475,7 @@
     var toggle = document.getElementById("release-toggle");
     if (!menu) return;
     var matches = ensurePick();
-    var current = state.projects.find(function (project) { return project.slug === state.pick; });
-    if (toggle) toggle.textContent = current ? current.name : "Releases";
+    if (toggle) toggle.textContent = "Releases";
     if (!state.projects.length) {
       menu.replaceChildren(el("li", {}, [el("span", { class: "dropdown-note", text: "Nothing on the shelf yet." })]));
       return;
@@ -497,12 +490,10 @@
         el("button", {
           type: "button",
           role: "menuitem",
+          text: project.name,
           "data-slug": project.slug,
           "aria-current": on ? "true" : "false"
-        }, [
-          el("span", { text: project.name }),
-          el("span", { class: "ver-bit", text: versionLabel(project) })
-        ])
+        })
       ]);
     }));
   }
