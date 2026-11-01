@@ -26,7 +26,8 @@
     ashencrown: {
       name: "Ashen Crown",
       blurb: "Battle chess. Alliance faces the Horde, and every capture is a fight.",
-      repo: "https://github.com/TheWhiteWitchTM/ashencrown"
+      repo: "https://github.com/TheWhiteWitchTM/ashencrown",
+      image: "https://thewhitewitchtm.github.io/Releases/ashencrown/banner.jpg"
     },
     "magic-dock": {
       name: "MAGIC Dock",
