@@ -458,8 +458,11 @@
 
   function ensurePick() {
     var matches = matchingProjects();
-    var still = matches.some(function (project) { return project.slug === state.pick; });
-    if (!still) state.pick = matches.length ? matches[0].slug : "";
+    var still = state.pick && matches.some(function (project) { return project.slug === state.pick; });
+    if (!still) {
+      state.pick = "";
+      state.pickedByUser = false;
+    }
     return matches;
   }
 
@@ -584,6 +587,7 @@
     var list = document.getElementById("list");
     var count = document.getElementById("count");
     if (!list) return;
+    var q = state.query.trim().toLowerCase();
     ensurePick();
     var shown = 0;
     list.querySelectorAll(".project").forEach(function (card) {
@@ -601,20 +605,17 @@
         details.querySelectorAll(".release").forEach(function (block) { if (!block.hidden) any = true; });
         details.hidden = !any;
       });
-      var visible = !!state.pick && card.dataset.slug === state.pick;
+      var platformOk = state.platform === "All" || (card.dataset.platforms || "").split(" ").indexOf(state.platform.toLowerCase()) !== -1;
+      var queryOk = !q || (card.dataset.hay || "").indexOf(q) !== -1;
+      var visible = platformOk && queryOk;
       card.hidden = !visible;
       if (visible) shown++;
     });
     if (count) {
       if (!state.projects.length) count.textContent = "";
       else if (!shown) count.textContent = "Nothing on the shelf matches that.";
-      else if (state.query.trim() || state.platform !== "All") {
-        var n = matchingProjects().length;
-        count.textContent = n + (n === 1 ? " match" : " matches");
-      } else {
-        var total = state.projects.length;
-        count.textContent = total + (total === 1 ? " release. Pick another from the menu." : " releases. Pick another from the menu.");
-      }
+      else if (q || state.platform !== "All") count.textContent = shown + (shown === 1 ? " match" : " matches");
+      else count.textContent = shown + (shown === 1 ? " release" : " releases");
     }
   }
 
