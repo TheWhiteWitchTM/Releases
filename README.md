@@ -9,6 +9,8 @@ Native Qt apps, Bluesky clients, emoji games, MAGIC language tools, retro emulat
 
 One place. All the binaries. No hunting through individual repos.
 
+The shelf is [thewhitewitchtm.github.io/Releases](https://thewhitewitchtm.github.io/Releases/). It reads this repository. A new project folder shows up there on its own.
+
 ---
 
 ## ✨ What's here
@@ -43,11 +45,21 @@ More arrive as they ship. Newest first.
 
 ## 📥 How to use
 
-1. Pick a project above (or check the [Releases](https://github.com/TheWhiteWitchTM/Releases/releases) tab).
+1. Open the [shelf](https://thewhitewitchtm.github.io/Releases/), or pick a project above.
 2. Download the latest asset for your platform.
 3. Unzip and run. Most Qt apps are self-contained.
 
 Source lives in the individual repositories if you want to build it yourself.
+
+## Adding a release
+
+Put the packages in a project folder, then a version folder. Put the system in the filename (`linux`, `windows`, or `macos`) and the arch (`x86_64`, `arm64`).
+
+```text
+project-name/1.2.3/project-name-1.2.3-linux-x86_64.tar.gz
+```
+
+The shelf picks that folder up. It does not need a page edit. `assets/` is the website, not a project.
 
 ---
 
