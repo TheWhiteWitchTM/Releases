@@ -23,6 +23,11 @@
       page: "https://thewhitewitchtm.github.io/blogy/",
       image: "https://thewhitewitchtm.github.io/assets/images/blogy.jpg"
     },
+    ashencrown: {
+      name: "Ashen Crown",
+      blurb: "Battle chess. Alliance faces the Horde, and every capture is a fight.",
+      repo: "https://github.com/TheWhiteWitchTM/ashencrown"
+    },
     "magic-dock": {
       name: "MAGIC Dock",
       blurb: "Stacks on the COSMIC dock. Pins, search, and the edge you already set in Settings.",

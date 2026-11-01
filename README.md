@@ -19,6 +19,7 @@ This repository collects pre-built releases from across the desk:
 
 | Project | What it is | Where to grab it |
 |---------|------------|------------------|
+| **Ashen Crown** | Battle chess. Every capture is a fight. | [0.5.2](ashencrown/0.5.2) |
 | **Grogy** | The Grok study. Chat, Grok Build, Imagine, and the bots. | [0.9.2 Beta](grogy/0.9.2-beta) |
 | **Blogy** | Markdown blog editor with AI (Grok) support | [0.8.2](blogy/0.8.2) |
 | **Vesper** | Linux media player that doesn't suck | [0.9.3](vesper/0.9.3) |
