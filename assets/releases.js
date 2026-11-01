@@ -379,16 +379,27 @@
     return sig;
   }
 
-  function cardFor(project) {
+  function projectHay(project) {
     var hay = [project.name, project.slug, project.blurb, project.tag].concat(project.platforms);
     project.versions.forEach(function (v) {
       hay.push(v.name);
       v.assets.forEach(function (a) { hay.push(a.name, a.platform, a.arch, a.kind); });
     });
+    return hay.join(" ").toLowerCase();
+  }
+
+  function versionLabel(project) {
+    var latest = project.versions[0];
+    if (!latest) return "";
+    return latest.name === "files" ? "files" : latest.name;
+  }
+
+  function cardFor(project) {
     var card = el("article", {
       class: "project",
       id: domId(project.slug),
-      "data-hay": hay.join(" ").toLowerCase(),
+      "data-slug": project.slug,
+      "data-hay": projectHay(project),
       "data-platforms": project.platforms.map(function (p) { return p.toLowerCase(); }).join(" ")
     });
     var body = el("div", { class: "project-body" });
@@ -435,7 +446,98 @@
     });
   }
 
-  var state = { projects: [], platform: "All", query: "" };
+  var state = { projects: [], platform: "All", query: "", pick: "", pickedByUser: false };
+
+  function projectMatches(project) {
+    if (state.platform !== "All") {
+      var names = project.platforms.map(function (name) { return name.toLowerCase(); });
+      if (names.indexOf(state.platform.toLowerCase()) === -1) return false;
+    }
+    var q = state.query.trim().toLowerCase();
+    if (q && projectHay(project).indexOf(q) === -1) return false;
+    return true;
+  }
+
+  function matchingProjects() {
+    return state.projects.filter(projectMatches);
+  }
+
+  function ensurePick() {
+    var matches = matchingProjects();
+    var still = matches.some(function (project) { return project.slug === state.pick; });
+    if (!still) state.pick = matches.length ? matches[0].slug : "";
+    return matches;
+  }
+
+  function setMenuOpen(open) {
+    var drop = document.getElementById("release-drop");
+    var toggle = document.getElementById("release-toggle");
+    if (drop) drop.classList.toggle("is-open", open);
+    if (toggle) toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function renderMenu() {
+    var menu = document.getElementById("release-menu");
+    var toggle = document.getElementById("release-toggle");
+    if (!menu) return;
+    var matches = ensurePick();
+    var current = state.projects.find(function (project) { return project.slug === state.pick; });
+    if (toggle) toggle.textContent = current ? current.name : "Releases";
+    if (!state.projects.length) {
+      menu.replaceChildren(el("li", {}, [el("span", { class: "dropdown-note", text: "Nothing on the shelf yet." })]));
+      return;
+    }
+    if (!matches.length) {
+      menu.replaceChildren(el("li", {}, [el("span", { class: "dropdown-note", text: "Nothing matches that." })]));
+      return;
+    }
+    menu.replaceChildren.apply(menu, matches.map(function (project) {
+      var on = project.slug === state.pick;
+      return el("li", {}, [
+        el("button", {
+          type: "button",
+          role: "menuitem",
+          "data-slug": project.slug,
+          "aria-current": on ? "true" : "false"
+        }, [
+          el("span", { text: project.name }),
+          el("span", { class: "ver-bit", text: versionLabel(project) })
+        ])
+      ]);
+    }));
+  }
+
+  function chooseProject(slug, push) {
+    if (!slug) return;
+    state.pick = slug;
+    state.pickedByUser = true;
+    var url = "#" + encodeURIComponent(slug);
+    if (push && location.hash !== url) history.pushState(null, "", url);
+    else if (location.hash !== url) history.replaceState(null, "", url);
+    setMenuOpen(false);
+    renderMenu();
+    applyFilter();
+    var card = document.getElementById(domId(slug));
+    if (card && card.scrollIntoView) card.scrollIntoView({ block: "nearest" });
+  }
+
+  function pickFromHash() {
+    var hash = "";
+    try { hash = decodeURIComponent(location.hash.replace(/^#/, "")); }
+    catch (err) { hash = location.hash.replace(/^#/, ""); }
+    if (!hash) {
+      state.pick = "";
+      state.pickedByUser = false;
+      return;
+    }
+    var project = state.projects.find(function (item) {
+      return item.slug === hash || domId(item.slug) === hash;
+    });
+    if (project) {
+      state.pick = project.slug;
+      state.pickedByUser = true;
+    }
+  }
 
   function renderStats(projects) {
     var stats = document.getElementById("stats");
@@ -491,11 +593,9 @@
     var list = document.getElementById("list");
     var count = document.getElementById("count");
     if (!list) return;
-    var q = state.query.trim().toLowerCase();
+    ensurePick();
     var shown = 0;
     list.querySelectorAll(".project").forEach(function (card) {
-      var platformOk = state.platform === "All" || (card.dataset.platforms || "").split(" ").indexOf(state.platform.toLowerCase()) !== -1;
-      var queryOk = !q || (card.dataset.hay || "").indexOf(q) !== -1;
       card.querySelectorAll(".dl").forEach(function (link) {
         var osOk = state.platform === "All" || link.dataset.os === state.platform.toLowerCase();
         link.hidden = !osOk;
@@ -510,14 +610,20 @@
         details.querySelectorAll(".release").forEach(function (block) { if (!block.hidden) any = true; });
         details.hidden = !any;
       });
-      var visible = platformOk && queryOk;
+      var visible = !!state.pick && card.dataset.slug === state.pick;
       card.hidden = !visible;
       if (visible) shown++;
     });
     if (count) {
       if (!state.projects.length) count.textContent = "";
       else if (!shown) count.textContent = "Nothing on the shelf matches that.";
-      else count.textContent = shown + (shown === 1 ? " project" : " projects");
+      else if (state.query.trim() || state.platform !== "All") {
+        var n = matchingProjects().length;
+        count.textContent = n + (n === 1 ? " match" : " matches");
+      } else {
+        var total = state.projects.length;
+        count.textContent = total + (total === 1 ? " release. Pick another from the menu." : " releases. Pick another from the menu.");
+      }
     }
   }
 
@@ -525,6 +631,8 @@
     renderStats(state.projects);
     renderPills(state.projects);
     renderList();
+    if (scroll) pickFromHash();
+    renderMenu();
     applyFilter();
     var shelf = document.getElementById("shelf");
     if (shelf) shelf.setAttribute("aria-busy", "false");
@@ -541,6 +649,7 @@
     sortProjects(state.projects);
     var after = state.projects.map(function (project) { return project.slug; }).join("|");
     if (before !== after) {
+      if (!state.pickedByUser) state.pick = "";
       paint(false);
       return;
     }
@@ -661,9 +770,12 @@
   function mount() {
     var input = document.getElementById("q");
     var pills = document.getElementById("pills");
+    var toggle = document.getElementById("release-toggle");
+    var menu = document.getElementById("release-menu");
     if (input) {
       input.addEventListener("input", function () {
         state.query = input.value;
+        renderMenu();
         applyFilter();
       });
     }
@@ -675,9 +787,35 @@
         pills.querySelectorAll("button").forEach(function (other) {
           other.setAttribute("aria-pressed", other === button ? "true" : "false");
         });
+        renderMenu();
         applyFilter();
       });
     }
+    if (toggle) {
+      toggle.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var drop = document.getElementById("release-drop");
+        setMenuOpen(!(drop && drop.classList.contains("is-open")));
+      });
+    }
+    if (menu) {
+      menu.addEventListener("click", function (event) {
+        var button = event.target.closest("button");
+        if (!button || !button.dataset.slug) return;
+        chooseProject(button.dataset.slug, true);
+      });
+    }
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest("#release-drop")) setMenuOpen(false);
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") setMenuOpen(false);
+    });
+    window.addEventListener("hashchange", function () {
+      pickFromHash();
+      renderMenu();
+      applyFilter();
+    });
     load();
   }
 
