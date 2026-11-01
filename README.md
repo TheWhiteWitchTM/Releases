@@ -21,7 +21,7 @@ This repository collects pre-built releases from across the desk:
 |---------|------------|------------------|
 | **Grogy** | The Grok study. Chat, Grok Build, Imagine, and the bots. | [0.9.2 Beta](grogy/0.9.2-beta) |
 | **Blogy** | Markdown blog editor with AI (Grok) support | [0.8.2](blogy/0.8.2) |
-| **Vesper** | Linux media player that doesn't suck | [vesper](https://github.com/TheWhiteWitchTM/vesper) |
+| **Vesper** | Linux media player that doesn't suck | [0.9.3](vesper/0.9.3) |
 | **MAGIC Dock** | Better dock for Pop!_OS / COSMIC with stacks | [MAGIC-Dock](https://github.com/TheWhiteWitchTM/MAGIC-Dock) |
 | **LibreSky** | Better Bluesky client with local AI | [LibreSky](https://github.com/TheWhiteWitchTM/LibreSky) |
 | **Cinder** | Editor for bash & sh scripts | [cinder](https://github.com/TheWhiteWitchTM/cinder) |
